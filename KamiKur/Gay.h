@@ -1,0 +1,34 @@
+#pragma once
+
+int NewGame();
+void Game(bool New);
+void Load();
+int Save();
+void NextLvl();
+void InitGame(SDL_Renderer* renderer);
+void FreeGame();
+bool GetExit(int x, int y);
+void update(int click);
+void render(SDL_Renderer *renderer);
+void DrawBonus(SDL_Renderer *rend);
+void DrawLvl(SDL_Renderer *rend);
+void DrawLife(SDL_Renderer *rend);
+void DrawScore(SDL_Renderer *rend);
+void DrawCart(SDL_Renderer *rend);
+void DrawnBlock(SDL_Renderer *rend, int i, int j);
+void ReadCart();
+void MoveBall();
+bool CarBall();
+void BlockBall();
+void Bonus();
+void BonusSpeed(int a, int b);
+int BonusBl();
+void Lose();
+void Win();
+void DrawBall(SDL_Renderer *renderer);
+void DrawCar(SDL_Renderer *renderer);
+void background(SDL_Renderer *renderer);
+void CarMove(int click);
+void NeedSave();
+int GetSave(int x, int y);
+int MLoad();
