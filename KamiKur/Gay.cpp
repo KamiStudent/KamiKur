@@ -17,11 +17,12 @@ struct Car {
 struct Ball {
 	int CoordX;
 	int CoordY;
-	int bonus;
-	int speed;
+	int vx;
+	int vy;
 	int naprx;
 	int napry;
 };
+
 Car car{ 389,578,0,65 };
 Ball ball{ 421,543,0,10,1,-1 };
 int **Cart = NULL;
@@ -94,7 +95,7 @@ void DrawCar(SDL_Renderer *renderer) {
 
 void DrawBall(SDL_Renderer *renderer) {
 
-	SDL_Rect Dest{ ball.CoordX,ball.CoordY,34,34 };
+	SDL_Rect Dest{ ball.CoordX+15,ball.CoordY+15,34,34 };
 	SDL_RenderCopy(renderer, ballt, NULL, &Dest);
 
 };
@@ -138,8 +139,9 @@ int BonusBl() {
 };
 void BonusSpeed(int a, int b) {
 	if (a == 0) {
-		if (b < 0) ball.speed -= 3;
-		else ball.speed += 3;
+		if (b < 0) { ball.vx -= 3; ball.vy -= 3; }
+		else { ball.vx += 3; ball.vy += 3;
+		}
 	}
 	else {
 		if (b < 0) car.speed -= 3;
@@ -166,20 +168,45 @@ void Bonus() {
 }
 bool win = true;
 
+bool CollideX(int step, int L, int P ) {
+	if (ball.CoordX - 15 >= L && ball.CoordX + 15 <= P)
+		return 1;
+	else if (ball.CoordX - 15 + step >= L && ball.CoordX + 15 + step <= P)
+		return 1;
+	else return 0;
+}
 
+bool CollideY(int step, int V, int N) {
+	if (ball.CoordY - 15 >= V && ball.CoordX + 15 <= N)
+		return 1;
+	else if (ball.CoordX - 15 + step >= V && ball.CoordX + 15 + step <= N)
+		return 1;
+	else return 0;
+}
+// переписать
 void BlockBall()
 {
 	win = true;
 	bool bon = false;
+	int stx = ball.naprx*ball.vx;
+	int sty = ball.napry*ball.vy;
+	int L;//Lev
+	int N;//Niz
+	int V;//verx
+	int P;// prav
 	for (int i = 0; i < 6; i++)
 	{
 		for (int j = 0; j < 13; j++)
 		{
+			V = i * 30 + 100;
+			N = (i + 1) * 30 + 100;
+			L = j * 60 + 10;
+			P = (j+1) * 60 + 10;
 			if (Cart[i][j] > 0) {
 				win = false;
 				if (ball.napry < 0) {
 					if (ball.naprx > 0) {
-						if (ball.CoordY + ball.speed*ball.napry <= (100 + (i + 1) * 30) && ball.CoordY >= (100 + (i + 1) * 30) && ((ball.CoordX <= 10 + (j + 1) * 60 && ball.CoordX + 30 >= 10 + (j) * 60) || (ball.CoordX + 30 + ball.speed*ball.naprx >= 10 + j * 60 && ball.CoordX + 30 <= 10 + j * 60)))
+						//if (CollideX(stx,L,P)||CollideY(sty,V,N))
 						{
 							Cart[i][j]--;
 							score += 10;
@@ -203,13 +230,13 @@ void BlockBall()
 				else if (ball.napry > 0)
 				{
 					if (ball.naprx > 0) {
-						if (ball.CoordY + ball.speed*ball.napry + 30 >= (100 + (i) * 30) && ball.CoordY + 30 <= (100 + (i) * 30) && ((ball.CoordX + 30 <= 10 + (j) * 60 && ball.CoordX + ball.speed*ball.naprx + 30 >= 10 + j * 60) || (ball.CoordX + 30 >= (10 + (j) * 60) && ball.CoordX <= (10 + (j) * 60))))
+						if (ball.CoordY + ball.speed*ball.napry + 30 >= (100 + (i) * 30) && ball.CoordY + 30 <= (100 + (i) * 30) && ((ball.CoordX + 30 <= 10 + (j) * 60 && ball.CoordX + ball.speed*ball.naprx + 30 >= 10 + j * 60) || (ball.CoordX + 30 >= (10 + (j) * 60) && ball.CoordX <= (10 + (j+1) * 60))))
 						{
 							Cart[i][j]--;
 							score += 10;
 							if (Cart[i][j] == 0) bon = true;
-							if (ball.CoordX + 30 <= 10 + (j) * 60 && ball.CoordX + ball.speed*ball.naprx + 30 >= 10 + j * 60) ball.napry *= -1;
-							else ball.naprx *= -1;
+							if (ball.CoordX + 30 <= 10 + (j) * 60 && ball.CoordX + ball.speed*ball.naprx + 30 >= 10 + j * 60) ball.naprx *= -1;
+							else ball.napry *= -1;
 						}
 						/*else if (ball.CoordY + ball.speed*ball.napry + 30 >= (H - 22) && ball.CoordY + 30 <= (H - 22) && ball.CoordX <= car.coordX + 125 && ball.CoordX + 30 >= car.coordX)
 						{
@@ -223,8 +250,8 @@ void BlockBall()
 							Cart[i][j]--;
 							score += 10;
 							if (Cart[i][j] == 0) bon = true;
-							if (ball.CoordX + ball.speed*ball.naprx <= 10 + (j + 1) * 60 && ball.CoordX >= 10 + (j + 1) * 60) ball.napry *= -1;
-							else ball.naprx *= -1;
+							if (ball.CoordX + ball.speed*ball.naprx <= 10 + (j + 1) * 60 && ball.CoordX >= 10 + (j + 1) * 60) ball.naprx *= -1;
+							else ball.napry *= -1;
 						}
 					}
 
@@ -238,7 +265,7 @@ void BlockBall()
 
 	bool CarBall() {
 		if (ball.napry > 0) {
-			if (ball.CoordX > car.coordX && ball.CoordX < car.coordX + 125)
+			if (ball.CoordX-15 > car.coordX && ball.CoordX+15 < car.coordX + 125)
 			{
 				ball.napry *= -1;
 				return false;
@@ -257,7 +284,7 @@ void BlockBall()
 		{
 			ball.naprx *= -1;
 		}
-		else if (ball.CoordX + ball.naprx*ball.speed <= 0)
+		else if (ball.CoordX + ball.naprx*ball.vx <= 0)
 		{
 			ball.CoordX = 0; flag = 1;
 		}
@@ -266,7 +293,7 @@ void BlockBall()
 		{
 			ball.naprx *= -1;
 		}
-		else if (ball.CoordX + 34 + ball.naprx*ball.speed >= W)
+		else if (ball.CoordX + 34 + ball.naprx*ball.vx >= W)
 		{
 			ball.CoordX = W - 34; flag = 1;
 		}
@@ -276,7 +303,7 @@ void BlockBall()
 		{
 			ball.napry *= -1;
 		}
-		else if (ball.CoordY + ball.napry*ball.speed <= 0)
+		else if (ball.CoordY + ball.napry*ball.vy <= 0)
 		{
 			ball.CoordY = 0; flag = 2;
 		}
@@ -284,25 +311,25 @@ void BlockBall()
 		BlockBall();
 		Bonus();
 		if (ball.CoordY + 44 > H)
-		{
+		{/*
 			if (CarBall()) {
 				Life--;
 				lost = true;
 				if (Life == 0) {
 					Lose();
 					quit = true;
-				}
+				}*/
 				ball.napry *= -1;
-			}
+			//}
 		}
 		//Выше описано поведение мячика при столкновении со стенками
 		if (flag != 1)
 		{
-			ball.CoordX += ball.naprx*ball.speed;
+			ball.CoordX += ball.naprx*ball.vx;
 		}
 		if (flag != 2)
 		{
-			ball.CoordY += ball.napry*ball.speed;
+			ball.CoordY += ball.napry*ball.vy;
 		}
 	}
 	void ReadCart() {
@@ -436,7 +463,7 @@ void BlockBall()
 		SDL_RenderPresent(renderer);
 	}
 
-
+	bool Nextlvl = false;
 	void update(int click) {
 		CarMove(click);
 		if (!lost) {
@@ -453,7 +480,7 @@ void BlockBall()
 				quit = true;
 			}
 			else lvl++;
-			NextLvl();
+			Nextlvl=true;
 
 		}
 	}
@@ -466,6 +493,7 @@ void BlockBall()
 		win = false;
 		Game(true);
 	}
+
 	bool GetExit(int x, int y)
 	{
 		for (int i = 0; i < 4; i++)
@@ -491,7 +519,7 @@ void BlockBall()
 					fscanf_s(fd, "%d", &Cart[i][j]);
 				}
 			}//LoadCart();
-			fscanf(fd, "%d%d", &ball.bonus, &ball.speed);
+			fscanf(fd, "%d%d", &ball.vx, &ball.vy);
 			//LoadBalls();
 			fscanf(fd, "%d", &score);
 			//LoadSchet();
@@ -531,7 +559,9 @@ void BlockBall()
 				if (event.type == SDL_MOUSEBUTTONDOWN)
 				{
 					q = GetSave(event.button.x, event.button.y);
-					if (q == 1) Save();
+					if (q == 1) {
+						Save(); q = 3;
+					}
 					else if (event.type == SDL_QUIT) q = 3;
 				}
 			}
@@ -558,7 +588,7 @@ void BlockBall()
 			}
 			fprintf(fd, "\n");
 		}//SaveCart();
-		fprintf(fd, "%d %d ", ball.bonus, ball.speed);
+		fprintf(fd, "%d %d ", ball.vx, ball.vy);
 		//SaveBalls();
 		fprintf(fd, "%d ", score);
 		InRecords(score);
@@ -617,12 +647,13 @@ void BlockBall()
 		FreeGame();
 		SDL_DestroyRenderer(renderer);
 		SDL_DestroyWindow(window);
+		if (Nextlvl)NextLvl();
 
 	}
 
 	int NewGame() {
 		Car car{ 389,578,0,150 };
-		Ball ball{ 421,543,0,6,1,-1 };
+		Ball ball{ 421,543,3,6,1,-1 };
 		lost = true;
 		quit = false;
 		win = false;
