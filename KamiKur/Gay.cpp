@@ -7,6 +7,8 @@
 #include<string.h>
 #include "Gay.h"
 #include"Records.h"
+
+
 struct Car {
 	int coordX;
 	int coordY;
@@ -23,8 +25,8 @@ struct Ball {
 	int napry;
 };
 
-Car car;
-Ball ball;
+Car car{ 15,578,0,150 };
+Ball ball{ 15,563,4,12,-1,-1 };
 int **Cart = NULL;
 bool lost = false;
 bool quit = false;
@@ -188,13 +190,13 @@ return ((y-yn)*(xk-xn)/(yk-yn)+xn);
 
 int MirrorY(int xn, int xk, int x, int yn, int yk){
 
-return ((x-xn)*(yk-yn)/(yk-yn)-yn);
+return ((x-xn)*(yk-yn)/(yk-yn)+yn);
 }
 // ïåðåïèñàòü
 void BlockBall()
 {
 	win = true;
-	bool bon = false,
+	bool bon = false;
 	int stx = ball.naprx*ball.vx;
 	int sty = ball.napry*ball.vy;
 	int L;//Lev
@@ -216,7 +218,7 @@ void BlockBall()
                     if(ball.naprx>0) ball.CoordX-=MirrorX(ball.CoordX-stx,ball.CoordX,ball.CoordY-sty,ball.CoordY,L);
                     else ball.CoordX-=MirrorX(ball.CoordX-stx,ball.CoordX,ball.CoordY-sty,ball.CoordY,P);
 
-				naprx*=-1;
+				ball.naprx*=-1;
 				Cart[i][j]--;
                 score += 10;
                 if (Cart[i][j] == 0) bon = true;
@@ -224,7 +226,7 @@ void BlockBall()
                 if (CollideY(V,N)){
                     if (ball.napry>0) ball.CoordY-=MirrorY(ball.CoordX-stx,ball.CoordX,V,ball.CoordY-sty,ball.CoordY);
                     else ball.CoordY-=MirrorY(ball.CoordX-stx,ball.CoordX,N,ball.CoordY-sty,ball.CoordY);
-                    napry*=-1;
+                    ball.napry*=-1;
                     Cart[i][j]--;
                     score += 10;
                     if (Cart[i][j] == 0) bon = true;
@@ -625,8 +627,8 @@ void BlockBall()
 	}
 
 	int NewGame() {
-		Car car{ 389,578,0,150 };
-		Ball ball{ 421,543,3,6,1,-1 };
+		Car car{ 15,578,0,150 };
+		Ball ball{ 15,563,4,12,-1,-1 };
 		lost = true;
 		quit = false;
 		win = false;
