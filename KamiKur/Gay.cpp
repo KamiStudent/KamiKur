@@ -23,8 +23,8 @@ struct Ball {
 	int napry;
 };
 
-Car car{ 389,578,0,65 };
-Ball ball{ 421,543,0,10,1,-1 };
+Car car;
+Ball ball;
 int **Cart = NULL;
 bool lost = false;
 bool quit = false;
@@ -168,23 +168,33 @@ void Bonus() {
 }
 bool win = true;
 
-bool CollideX(int step, int L, int P ) {
+bool CollideX( int L, int P ) {
 	if (ball.CoordX - 15 >= L && ball.CoordX + 15 <= P) return 1;
-	if (ball.CoordX - 15 + step >= L && ball.CoordX + 15 + step <= P) return 1;
+//	if (ball.CoordX - 15 + step >= L && ball.CoordX + 15 + step <= P) return 1;
 	return 0;
 }
 
-bool CollideY(int step, int V, int N) {
+bool CollideY( int V, int N) {
 	if (ball.CoordY - 15 >= V && ball.CoordY + 15 <= N) return 1;
 //	if (debug) print "не попали в...."
-	if (ball.CoordY - 15 + step >= V && ball.CoordY + 15 + step <= N) return 1;
+//	if (ball.CoordY - 15 + step >= V && ball.CoordY + 15 + step <= N) return 1;
 	return 0;
+}
+
+int MirrorX(int xn,int xk,int yn, int yk, int y){//
+
+return ((y-yn)*(xk-xn)/(yk-yn)+xn);
+}
+
+int MirrorY(int xn, int xk, int x, int yn, int yk){
+
+return ((x-xn)*(yk-yn)/(yk-yn)-yn);
 }
 // ïåðåïèñàòü
 void BlockBall()
 {
 	win = true;
-	bool bon = false;
+	bool bon = false,
 	int stx = ball.naprx*ball.vx;
 	int sty = ball.napry*ball.vy;
 	int L;//Lev
@@ -201,64 +211,30 @@ void BlockBall()
 			P = (j+1) * 60 + 10;
 			if (Cart[i][j] > 0) {
 				win = false;
-				if (ball.napry < 0) {
-					if (ball.naprx > 0) {
-						//if (CollideX(stx,L,P)||CollideY(sty,V,N))
-						{
-							Cart[i][j]--;
-							score += 10;
-							if (Cart[i][j] == 0) bon = true;
-							if (ball.CoordX + 30 + ball.speed*ball.naprx >= 10 + j * 60 && ball.CoordX + 30 <= 10 + j * 60) ball.naprx *= -1;
-							else ball.napry *= -1;
-						}
-					}
-					else if (ball.naprx < 0) {
-						if (ball.CoordY + ball.speed*ball.napry <= (100 + (i + 1) * 30) && ball.CoordY >= (100 + (i + 1) * 30) && ((ball.CoordX <= 10 + (j + 1) * 60 && ball.CoordX + 30 >= 10 + (j) * 60) || (ball.CoordX >= 10 + (j + 1) * 60 && ball.CoordX + ball.speed*ball.naprx <= 10 + (j + 1) * 60)))
-						{
-							Cart[i][j]--;
-							score += 10;
-							if (Cart[i][j] == 0) bon = true;
-							if (ball.CoordX >= 10 + (j + 1) * 60 && ball.CoordX + ball.speed*ball.naprx <= 10 + (j + 1) * 60)
-							ball.naprx *= -1;
-							else ball.napry *= -1;
-						}
-					}
-				}
-				else if (ball.napry > 0)
-				{
-					if (ball.naprx > 0) {
-						if (ball.CoordY + ball.speed*ball.napry + 30 >= (100 + (i) * 30) && ball.CoordY + 30 <= (100 + (i) * 30) && ((ball.CoordX + 30 <= 10 + (j) * 60 && ball.CoordX + ball.speed*ball.naprx + 30 >= 10 + j * 60) || (ball.CoordX + 30 >= (10 + (j) * 60) && ball.CoordX <= (10 + (j+1) * 60))))
-						{
-							Cart[i][j]--;
-							score += 10;
-							if (Cart[i][j] == 0) bon = true;
-							if (ball.CoordX + 30 <= 10 + (j) * 60 && ball.CoordX + ball.speed*ball.naprx + 30 >= 10 + j * 60) ball.naprx *= -1;
-							else ball.napry *= -1;
-						}
-						/*else if (ball.CoordY + ball.speed*ball.napry + 30 >= (H - 22) && ball.CoordY + 30 <= (H - 22) && ball.CoordX <= car.coordX + 125 && ball.CoordX + 30 >= car.coordX)
-						{
-						ball.napry *= -1;
-						}*/
-					}
-					else if (ball.naprx < 0)
-					{
-						if (ball.CoordY + ball.speed*ball.napry + 30 >= (100 + (i) * 30) && ball.CoordY + 30 <= (100 + (i + 1) * 30) && ((ball.CoordX + ball.speed*ball.naprx <= 10 + (j + 1) * 60 && ball.CoordX >= 10 + (j + 1) * 60) || (ball.CoordX <= (10 + (j + 1) * 60) && ball.CoordX + 30 >= 10 + j * 60)))
-						{
-							Cart[i][j]--;
-							score += 10;
-							if (Cart[i][j] == 0) bon = true;
-							if (ball.CoordX + ball.speed*ball.naprx <= 10 + (j + 1) * 60 && ball.CoordX >= 10 + (j + 1) * 60) ball.naprx *= -1;
-							else ball.napry *= -1;
-						}
-					}
 
-				}
+				if(CollideX(L,P)){
+                    if(ball.naprx>0) ball.CoordX-=MirrorX(ball.CoordX-stx,ball.CoordX,ball.CoordY-sty,ball.CoordY,L);
+                    else ball.CoordX-=MirrorX(ball.CoordX-stx,ball.CoordX,ball.CoordY-sty,ball.CoordY,P);
 
+				naprx*=-1;
+				Cart[i][j]--;
+                score += 10;
+                if (Cart[i][j] == 0) bon = true;
 				}
-				if (bon) bonus = BonusBl();
-			}
-		}
-	}
+                if (CollideY(V,N)){
+                    if (ball.napry>0) ball.CoordY-=MirrorY(ball.CoordX-stx,ball.CoordX,V,ball.CoordY-sty,ball.CoordY);
+                    else ball.CoordY-=MirrorY(ball.CoordX-stx,ball.CoordX,N,ball.CoordY-sty,ball.CoordY);
+                    napry*=-1;
+                    Cart[i][j]--;
+                    score += 10;
+                    if (Cart[i][j] == 0) bon = true;
+                }
+
+            }
+            if (bon) bonus = BonusBl();
+        }
+    }
+}
 
 	bool CarBall() {
 		if (ball.napry > 0) {
