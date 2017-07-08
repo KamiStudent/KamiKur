@@ -95,7 +95,7 @@ void DrawCar(SDL_Renderer *renderer) {
 
 void DrawBall(SDL_Renderer *renderer) {
 
-	SDL_Rect Dest{ ball.CoordX+15,ball.CoordY+15,34,34 };
+	SDL_Rect Dest{ ball.CoordX-15,ball.CoordY-15,34,34 };
 	SDL_RenderCopy(renderer, ballt, NULL, &Dest);
 
 };
@@ -169,21 +169,18 @@ void Bonus() {
 bool win = true;
 
 bool CollideX(int step, int L, int P ) {
-	if (ball.CoordX - 15 >= L && ball.CoordX + 15 <= P)
-		return 1;
-	else if (ball.CoordX - 15 + step >= L && ball.CoordX + 15 + step <= P)
-		return 1;
-	else return 0;
+	if (ball.CoordX - 15 >= L && ball.CoordX + 15 <= P) return 1;
+	if (ball.CoordX - 15 + step >= L && ball.CoordX + 15 + step <= P) return 1;
+	return 0;
 }
 
 bool CollideY(int step, int V, int N) {
-	if (ball.CoordY - 15 >= V && ball.CoordX + 15 <= N)
-		return 1;
-	else if (ball.CoordX - 15 + step >= V && ball.CoordX + 15 + step <= N)
-		return 1;
-	else return 0;
+	if (ball.CoordY - 15 >= V && ball.CoordY + 15 <= N) return 1;
+//	if (debug) print "РЅРµ РїРѕРїР°Р»Рё РІ...."
+	if (ball.CoordY - 15 + step >= V && ball.CoordY + 15 + step <= N) return 1;
+	return 0;
 }
-// переписать
+// ГЇГҐГ°ГҐГЇГЁГ±Г ГІГј
 void BlockBall()
 {
 	win = true;
@@ -280,37 +277,37 @@ void BlockBall()
 
 		int flag = 0;
 
-		if (ball.CoordX == 0 && ball.naprx < 0) //коордХ-радиус
+		if (ball.CoordX == 15 && ball.naprx < 0) //ГЄГ®Г®Г°Г¤Г•-Г°Г Г¤ГЁГіГ±
 		{
 			ball.naprx *= -1;
 		}
-		else if (ball.CoordX + ball.naprx*ball.vx <= 0)
+		else if (ball.CoordX + ball.naprx*ball.vx <= 15)
 		{
-			ball.CoordX = 0; flag = 1;
+			ball.CoordX = 15; flag = 1;
 		}
 
-		if (ball.CoordX + 34 == W&& ball.naprx > 0)
+		if (ball.CoordX + 15 == W&& ball.naprx > 0)
 		{
 			ball.naprx *= -1;
 		}
-		else if (ball.CoordX + 34 + ball.naprx*ball.vx >= W)
+		else if (ball.CoordX + 15 + ball.naprx*ball.vx >= W)
 		{
-			ball.CoordX = W - 34; flag = 1;
+			ball.CoordX = W - 15; flag = 1;
 		}
 
 
-		if (ball.CoordY == 0 && ball.napry < 0)
+		if (ball.CoordY == 15 && ball.napry < 0)
 		{
 			ball.napry *= -1;
 		}
-		else if (ball.CoordY + ball.napry*ball.vy <= 0)
+		else if (ball.CoordY + ball.napry*ball.vy <= 15)
 		{
-			ball.CoordY = 0; flag = 2;
+			ball.CoordY = 15; flag = 2;
 		}
 
 		BlockBall();
 		Bonus();
-		if (ball.CoordY + 44 > H)
+		if (ball.CoordY + 37 > H)
 		{/*
 			if (CarBall()) {
 				Life--;
@@ -322,7 +319,7 @@ void BlockBall()
 				ball.napry *= -1;
 			//}
 		}
-		//Выше описано поведение мячика при столкновении со стенками
+		//Г‚Г»ГёГҐ Г®ГЇГЁГ±Г Г­Г® ГЇГ®ГўГҐГ¤ГҐГ­ГЁГҐ Г¬ГїГ·ГЁГЄГ  ГЇГ°ГЁ Г±ГІГ®Г«ГЄГ­Г®ГўГҐГ­ГЁГЁ Г±Г® Г±ГІГҐГ­ГЄГ Г¬ГЁ
 		if (flag != 1)
 		{
 			ball.CoordX += ball.naprx*ball.vx;
