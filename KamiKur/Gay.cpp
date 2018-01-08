@@ -1,12 +1,29 @@
-#include "stdafx.h"
-#include <SDL.h>
-#include<SDL_ttf.h>
-#include "stdlib.h"
+// *** SDL app example, arcanoid.
+
+#ifdef __unix
+// Normal OS
+ #include <SDL2/SDL.h>
+ #include <SDL2/SDL_ttf.h>
+ #include <SDL2/SDL_stdinc.h>
+#else
+// Other OS
+ #include <SDL.h>
+ #include <SDL_ttf.h>
+#endif
+
 #include <cstdio>
 #include <ctime>
-#include<string.h>
+#include <string.h>
+
 #include "Gay.h"
-#include"Records.h"
+#include "Records.h"
+
+#ifdef __unix
+ //redefine MS crap
+ #define fopen_s(pFile,filename,mode) ((*(pFile))=fopen((filename),  (mode)))==NULL
+ #define fscanf_s( fmt, ... ) fscanf( fmt, __FILE__, __LINE__, __VA_ARGS__ )
+#endif
+
 
 
 struct Car {
@@ -25,8 +42,9 @@ struct Ball {
 	int napry;
 };
 
-Car car{ 15,578,0,150 };
-Ball ball{ 15,563,4,12,-1,-1 };
+bool win = true;
+Car car;
+Ball ball;
 int **Cart = NULL;
 bool lost = false;
 bool quit = false;
@@ -41,6 +59,7 @@ SDL_Surface* balls = NULL;
 SDL_Texture *ballt = NULL;
 SDL_Texture *backt = NULL;
 SDL_Surface* block[5];
+
 void CarMove(int click) {
 	if (click != 0)
 	{
@@ -168,7 +187,7 @@ void Bonus() {
 	default: break;
 	}
 }
-bool win = true;
+
 
 bool CollideX( int L, int P ) {
 	if (ball.CoordX - 15 >= L && ball.CoordX + 15 <= P) return 1;
@@ -188,14 +207,13 @@ int MirrorX(int xn,int xk,int yn, int yk, int y){//
 return ((y-yn)*(xk-xn)/(yk-yn)+xn);
 }
 
-int MirrorY(int xn, int xk, int x, int yn, int yk){
+int MirrorY(int xn, int xk, int yn, int yk, int x){
 
-return ((x-xn)*(yk-yn)/(yk-yn)+yn);
+return ((x-xn)*(yk-yn)/(yk-yn)-yn);
 }
 // ïåðåïèñàòü
 void BlockBall()
 {
-	win = true;
 	bool bon = false;
 	int stx = ball.naprx*ball.vx;
 	int sty = ball.napry*ball.vy;
@@ -203,6 +221,9 @@ void BlockBall()
 	int N;//Niz
 	int V;//verx
 	int P;// prav
+
+	win = true;
+
 	for (int i = 0; i < 6; i++)
 	{
 		for (int j = 0; j < 13; j++)
@@ -216,7 +237,7 @@ void BlockBall()
 
 				if(CollideX(L,P)){
                     if(ball.naprx>0) ball.CoordX-=MirrorX(ball.CoordX-stx,ball.CoordX,ball.CoordY-sty,ball.CoordY,L);
-                    else ball.CoordX-=MirrorX(ball.CoordX-stx,ball.CoordX,ball.CoordY-sty,ball.CoordY,P);
+                                else ball.CoordX-=MirrorX(ball.CoordX-stx,ball.CoordX,ball.CoordY-sty,ball.CoordY,P);
 
 				ball.naprx*=-1;
 				Cart[i][j]--;
@@ -224,12 +245,12 @@ void BlockBall()
                 if (Cart[i][j] == 0) bon = true;
 				}
                 if (CollideY(V,N)){
-                    if (ball.napry>0) ball.CoordY-=MirrorY(ball.CoordX-stx,ball.CoordX,V,ball.CoordY-sty,ball.CoordY);
-                    else ball.CoordY-=MirrorY(ball.CoordX-stx,ball.CoordX,N,ball.CoordY-sty,ball.CoordY);
-                    ball.napry*=-1;
-                    Cart[i][j]--;
-                    score += 10;
-                    if (Cart[i][j] == 0) bon = true;
+                    if (ball.napry>0) ball.CoordY-=MirrorY(ball.CoordX-stx,ball.CoordX,ball.CoordY-sty,ball.CoordY,V);
+                                 else ball.CoordY-=MirrorY(ball.CoordX-stx,ball.CoordX,ball.CoordY-sty,ball.CoordY,N);
+                ball.napry*=-1;
+                Cart[i][j]--;
+                score += 10;
+                if (Cart[i][j] == 0) bon = true;
                 }
 
             }
@@ -376,7 +397,7 @@ void BlockBall()
 		SDL_Color fore_color = { 63,72,204 };
 		SDL_Color back_color = { 255,255,255 };
 		SDL_Surface* textSurface = NULL;
-		_itoa_s(Life, text, 20);
+		SDL_itoa(Life, text, 20);
 		textSurface = TTF_RenderText_Shaded(my_font, text, fore_color, back_color);
 		SDL_Rect rect = { 910,111, 20, 50 };
 		SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, textSurface);
@@ -393,7 +414,7 @@ void BlockBall()
 		SDL_Color fore_color = { 63,72,204 };
 		SDL_Color back_color = { 255,255,255 };
 		SDL_Surface* textSurface = NULL;
-		_itoa_s(lvl, text, 20);
+		SDL_itoa(lvl, text, 20);
 		textSurface = TTF_RenderText_Shaded(my_font, text, fore_color, back_color);
 		SDL_Rect rect = { 942,203, 20, 50 };
 		SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, textSurface);
@@ -627,8 +648,8 @@ void BlockBall()
 	}
 
 	int NewGame() {
-		Car car{ 15,578,0,150 };
-		Ball ball{ 15,563,4,12,-1,-1 };
+		Car car{ 389,578,0,150 };
+		Ball ball{ 421,543,3,6,1,-1 };
 		lost = true;
 		quit = false;
 		win = false;
