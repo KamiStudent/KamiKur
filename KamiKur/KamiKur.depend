@@ -1,0 +1,49 @@
+# depslib dependency file v1.0
+1499541389 source:/home/coyote/work/KamiKur/KamiKur/Gay.cpp
+	<SDL2/SDL.h>
+	<SDL2/SDL_ttf.h>
+	<SDL2/SDL_stdinc.h>
+	<SDL.h>
+	<SDL_ttf.h>
+	<cstdio>
+	<ctime>
+	<string.h>
+	"Gay.h"
+	"Records.h"
+
+1499519553 /home/coyote/work/KamiKur/KamiKur/Gay.h
+
+1499519553 /home/coyote/work/KamiKur/KamiKur/Records.h
+
+1499541353 source:/home/coyote/work/KamiKur/KamiKur/KamiKur.cpp
+	<SDL2/SDL.h>
+	<SDL.h>
+	<cstdio>
+	<ctime>
+	<string.h>
+	"stdlib.h"
+	"Menu.h"
+	"Gay.h"
+	"Records.h"
+
+1499519553 /home/coyote/work/KamiKur/KamiKur/Menu.h
+
+1499541475 source:/home/coyote/work/KamiKur/KamiKur/Menu.cpp
+	<SDL2/SDL.h>
+	<SDL2/SDL_ttf.h>
+	<SDL.h>
+	<SDL_ttf.h>
+	"stdlib.h"
+	<cstdio>
+	<ctime>
+	<string.h>
+	"Menu.h"
+
+1499541544 source:/home/coyote/work/KamiKur/KamiKur/records.cpp
+	<SDL2/SDL.h>
+	<SDL2/SDL_ttf.h>
+	<SDL.h>
+	<SDL_ttf.h>
+	"stdlib.h"
+	"Records.h"
+
